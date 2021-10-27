@@ -23,7 +23,6 @@ def search():
     response = requests.get(url=url, params=params, headers=header)
 
     data = response.json()
-    print(data)
 
     payload = dict()
 
