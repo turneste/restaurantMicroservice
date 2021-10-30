@@ -69,6 +69,3 @@ def search():
             break
 
     return json.dumps(payload)
-
-if __name__ == '__main__':
-    app.run(debug=True)
