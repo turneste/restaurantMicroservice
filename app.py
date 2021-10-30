@@ -1,15 +1,25 @@
-from flask import Flask, request
-import json, requests, urllib.request
+from flask import Flask, request, render_template
+import json, urllib.request
+import requests
 from YelpKey import get_key
 app = Flask(__name__)
 
 @app.route('/')
 def index():
-    return "Hello"
+    city = "city=New%York"
+    state = "&state=NY"
+
+    url = "http://flip1.engr.oregonstate.edu:9797/search?" + city + state
+
+    print(url)
+    data = urllib.request.urlopen(url).read()
+    rest_list = json.loads(data)
+    return render_template("index.html", data=rest_list)
+
 
 @app.route('/search', methods=['GET'])
 def search():
-    city = request.args["city"]
+    city = request.args["city"] + request.args["state"]
 
 
     key = get_key()
@@ -24,7 +34,7 @@ def search():
 
     data = response.json()
 
-    payload = dict()
+    payload = []
 
     count = 1
     rest_num = 1
@@ -38,23 +48,24 @@ def search():
         except:
             price = False
         try:
-            road = data["businesses"][rest_num]["location"]["address1"]
+            street = data["businesses"][rest_num]["location"]["address1"]
             city = data["businesses"][rest_num]["location"]["city"]
             state = data["businesses"][rest_num]["location"]["state"]
-            address = [road, city, state]
         except:
-            address = False
+            street = False
 
-        if price is not False and address is not False:
+        if price is not False and street is not False:
             rest_data["name"] = name
             rest_data["price"] = price
-            rest_data["address"] = address
+            rest_data["street"] = street
+            rest_data["city"] = city
+            rest_data["state"] = state
             count += 1
 
-            payload[str(rest_num)] = rest_data
+            payload.append(rest_data)
 
         rest_num += 1
-        if count > 10:
+        if count > 5:
             break
 
     return json.dumps(payload)
