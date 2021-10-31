@@ -1,8 +1,10 @@
 from flask import Flask, request, render_template
 import json, urllib.request
 import requests
+from flask_cors import CORS
 from YelpKey import get_key
 app = Flask(__name__)
+CORS(app)
 
 @app.route('/')
 def index():
